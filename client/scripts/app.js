@@ -44,7 +44,7 @@ var makeStrSafe = function(message, type){
 
 var getRooms = function(){
   $.ajax({
-    url: 'https://api.parse.com/1/classes/chatterbox/?order=-createdAt',
+    url: 'http://127.0.0.1:3000/classes/messages',
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
@@ -74,7 +74,7 @@ var convertMessage =  function(message){
 
 var postMessage = function(message){
   $.ajax({
-    url: 'https://api.parse.com/1/classes/chatterbox',
+    url: 'http://127.0.0.1:3000/classes/messages',
     type: 'POST',
     data: JSON.stringify(message),
     contentType: 'application/json',
@@ -89,10 +89,11 @@ var postMessage = function(message){
 
 var getNewMessages = function(){
   $.ajax({
-    url: 'https://api.parse.com/1/classes/chatterbox/?order=-createdAt',
+    url: 'http://127.0.0.1:3000/classes/messages',
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
+      console.log(data);
       $('.message').remove();
       for(var i = 0; i < data["results"].length; i++){
         if(makeStrSafe(data["results"][i]["roomname"]) === selectedRoom){ 

@@ -4,7 +4,8 @@ You should implement your request handler function in this file.
 
 requestHandler is already getting passed to http.createServer()
 in basic-server.js, but it won't work as is.
-
+http://127.0.0.1:3000/favicon.ico
+http://127.0.0.1:3000/classes/room1
 You'll have to figure out a way to export this function from
 this file and include it in basic-server.js so that it actually works.
 
@@ -28,7 +29,9 @@ var requestHandler = function(request, response) {
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
   console.log("Serving request type " + request.method + " for url " + request.url);
-  console.log('Hello, World!');
+  //console.log('Hello, World!');
+  //console.log("request", request);
+  //console.log("respone", response);
 
   // The outgoing status.
   var statusCode = 200;
@@ -42,6 +45,25 @@ var requestHandler = function(request, response) {
   // other than plain text, like JSON or HTML.
   headers['Content-Type'] = "text/plain";
 
+  if(request.method === 'GET'){
+    if(request.url === '/classes/messages') {
+      response.writeHead(200, headers);
+      response.end("GET!");
+    }
+  } else if(request.method === 'POST'){
+      if(request.url === '/classes/messages') {
+        request.on('data', function(data){
+          console.log(JSON.parse(data));
+        });
+        response.writeHead(statusCode, headers);
+        response.end("POST!");
+      }
+  } else {
+      response.writeHead(statusCode, headers);
+      response.end("ELSE!");
+  }
+
+
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
   response.writeHead(statusCode, headers);
@@ -53,7 +75,7 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end("Hello, World!");
+  //response.end("Hello, World!");
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).
