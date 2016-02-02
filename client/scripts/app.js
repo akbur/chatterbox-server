@@ -48,16 +48,19 @@ var getRooms = function(){
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
-      for(var i = 0; i < data["results"].length; i++){
-        var roomName = makeStrSafe(data["results"][i]["roomname"]);
-        if(!uniqueRooms[roomName]){
-          $('select').append('<option value = "' + roomName + '">' + roomName + '</div>');
-        }
-        uniqueRooms[roomName] = true;
-      } 
+      if(data["results"]){
+        for(var i = 0; i < data["results"].length; i++){
+          var roomName = makeStrSafe(data["results"][i]["roomname"]);
+          if(!uniqueRooms[roomName]){
+            $('select').append('<option value = "' + roomName + '">' + roomName + '</div>');
+          }
+          uniqueRooms[roomName] = true;
+        } 
+      }
     },
     error: function (data) {
-      console.error('chatterbox: Failed to send message. Error: ', data.results[0]);
+      console.log(data);
+      console.error('chatterbox: Failed to send message. Error: ', data);
     }
   });
 }
@@ -93,9 +96,10 @@ var getNewMessages = function(){
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
+      var data = JSON.parse(data);
       console.log(data);
       $('.message').remove();
-      for(var i = 0; i < data["results"].length; i++){
+      for(var i = 0; i < data["results"].length; i++){ // {results: [{}, {}, {}, {}]}, obj.results.push(messageObj)
         if(makeStrSafe(data["results"][i]["roomname"]) === selectedRoom){ 
           var userName = makeStrSafe(data["results"][i]["username"]);
           var userPost = makeStrSafe(data["results"][i]["text"]);
@@ -108,6 +112,7 @@ var getNewMessages = function(){
       } 
     },
     error: function (data) {
+      var data = JSON.parse(data);  
       console.error('chatterbox: Failed to send message. Error: ', data.results[0]);
     }
   });

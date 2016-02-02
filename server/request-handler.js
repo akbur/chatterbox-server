@@ -12,6 +12,7 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+var messages = {"results": []};
 
 var requestHandler = function(request, response) {
   // Request and Response come from node's http module.
@@ -35,6 +36,7 @@ var requestHandler = function(request, response) {
 
   // The outgoing status.
   var statusCode = 200;
+  console.log(messages);
 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
@@ -44,23 +46,39 @@ var requestHandler = function(request, response) {
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
   headers['Content-Type'] = "text/plain";
-
   if(request.method === 'GET'){
     if(request.url === '/classes/messages') {
       response.writeHead(200, headers);
-      response.end("GET!");
+      var stringMsgs = JSON.stringify(messages);
+      console.log("stringMsgs in GET ", stringMsgs);
+      response.end(stringMsgs);
+    } else {
+      response.writeHead(404, headers);
+      response.end("404 Error");
     }
   } else if(request.method === 'POST'){
       if(request.url === '/classes/messages') {
         request.on('data', function(data){
-          console.log(JSON.parse(data));
+          var data = JSON.parse(data)
+          console.log(data);
+          console.log("messages before parse ", messages);
+          messages.results.push(data);
+          data = JSON.stringify(data);
+          console.log("messages after parse ", messages);
+          response.writeHead(201, headers);
+          response.end(data);
         });
-        response.writeHead(statusCode, headers);
-        response.end("POST!");
+        
+      } else {
+        response.writeHead(404, headers);
+        response.end("404 Error");
       }
+  } else if(request.method === 'OPTIONS'){
+    response.writeHead(200, headers);
+    response.end('option');
   } else {
-      response.writeHead(statusCode, headers);
-      response.end("ELSE!");
+      response.writeHead(404, headers);
+      response.end("404 Error");
   }
 
 
