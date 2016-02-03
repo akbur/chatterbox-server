@@ -2,13 +2,13 @@ var uniqueRooms = {};
 var friends = {};
 var url = window.location;
 var user = url['search'].substring(url['search'].lastIndexOf('=')+1);
-var selectedRoom = '';
+var selectedRoom = 'messages';
 
-$('select').on('change', function(){
+$('select').on('click', function(e){
   var roomName = '';
   $("select option:selected").each(function(){
     if($(this)[0].text === "Add room"){
-      roomName = prompt("Enter room name");
+      roomName = prompt("Enter room name");// || 'Lobby';
       if(!uniqueRooms[roomName]){
         $('select').append('<option value = "' + roomName + '">' + roomName + '</div>');
         uniqueRooms[roomName] = true;
@@ -90,14 +90,14 @@ var postMessage = function(message){
   });
 }
 
-var getNewMessages = function(){
+var getNewMessages = function(room) {
+  var room = arguments.length > 0 ? room : 'messages'; 
   $.ajax({
-    url: 'http://127.0.0.1:3000/classes/messages',
+    url: 'http://127.0.0.1:3000/classes/' + room,
     type: 'GET',
     contentType: 'application/json',
     success: function (data) {
       var data = JSON.parse(data);
-      console.log(data);
       $('.message').remove();
       for(var i = 0; i < data["results"].length; i++){ // {results: [{}, {}, {}, {}]}, obj.results.push(messageObj)
         if(makeStrSafe(data["results"][i]["roomname"]) === selectedRoom){ 
@@ -122,6 +122,7 @@ var getNewMessages = function(){
 getRooms();
 
 setInterval(function(){
-  getNewMessages();
+
+  getNewMessages(selectedRoom);
 }, 2000);
 
